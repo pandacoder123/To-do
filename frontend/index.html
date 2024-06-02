@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-do App</title>
+  </head>
+  <body>
+    <script>
+      let tasks = [];
+
+      function loop() {
+        const container = document.getElementById("container");
+        container.innerHTML = ""; // Clear the container before rendering tasks
+
+        for (const item of tasks) {
+          const p = document.createElement("p");
+          p.innerText = item;
+          container.appendChild(p);
+        }
+      }
+
+      async function getTasks() {
+        const response = await fetch("http://localhost:3000/tasks");
+        const items = await response.json();
+        tasks = items;
+        console.log(tasks);
+        loop(); // Call loop() after fetching tasks
+      }
+
+      getTasks();
+
+      async function removeAll() {
+        const response = await fetch("http://localhost:3000/remove");
+        
+      }
+
+      function addTask() {
+        const task = document.getElementById("task-input").value;
+        console.log(`Task: ${task}`); // Print Tasks
+
+        if (task.trim()) {
+          // Check if the input is not empty
+          fetch("http://localhost:3000/tasks", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ task }),
+          })
+            .then(() => getTasks()) // Fetch updated tasks after successful POST
+            .catch((error) => console.error("Error:", error));
+        }
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+
+        document.getElementById("task-input").value = ""; // Clear the input field
+      }
+    </script>
+    <h1>To do App</h1>
+    <div id="container"></div>
+    <input id="task-input" placeholder="input task here" />
+    <button type="submit" onclick="addTask()">Submit</button>
+    <button id="destory" onclick="removeAll()">Destory</button>
+  </body>
+</html>
